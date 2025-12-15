@@ -1,6 +1,8 @@
 package com.ecommerce.order.Service;
 
+import com.ecommerce.order.Client.ProductServiceClient;
 import com.ecommerce.order.DTO.CartItemRequest;
+import com.ecommerce.order.DTO.ProductResponse;
 import com.ecommerce.order.Model.CartItem;
 import com.ecommerce.order.Repository.CartItemRepository;
 import jakarta.transaction.Transactional;
@@ -15,30 +17,31 @@ import java.util.List;
 @Transactional
 public class CartService {
     private final CartItemRepository cartItemRepository;
+    private final ProductServiceClient productServiceClient;
     public boolean addToCart(String userId, CartItemRequest request) {
-//        Optional<Product> productOpt = productRepository.findById(request.getProductId());
-//        if(productOpt.isEmpty())
-//            return false;
-//        Product product = productOpt.get();
+        ProductResponse productResponse = productServiceClient.getProductById(request.getProductId());
+        if(productResponse==null)
+            return false;
+
 //        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
 //        if(userOpt.isEmpty())
 //            return false;
 //        User user = userOpt.get();
-//        if(product.getStockQuantity()<request.getQuantity()){
-//            return false;
-//        }
+        if(productResponse.getStockQuantity()<request.getQuantity()){
+            return false;
+        }
         CartItem existingCartItem = cartItemRepository.findByUserIdAndProductId(Long.valueOf(userId), request.getProductId());
         if(existingCartItem!=null){
             //update the quantity
             existingCartItem.setQuantity(existingCartItem.getQuantity()+ request.getQuantity());
-            existingCartItem.setPrice(BigDecimal.valueOf(1000.00));
+            existingCartItem.setPrice(productResponse.getPrice().multiply(BigDecimal.valueOf(existingCartItem.getQuantity())));
         }else{
             //create new cartItem
             CartItem cartItem = new CartItem();
             cartItem.setUserId(Long.valueOf(userId));
             cartItem.setProductId(request.getProductId());
             cartItem.setQuantity(request.getQuantity());
-            cartItem.setPrice(BigDecimal.valueOf(1000.00));
+            cartItem.setPrice(productResponse.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())));
             cartItemRepository.save((cartItem));
         }
         return true;
