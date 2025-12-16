@@ -38,7 +38,7 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
 
         Order order = new Order();
-        order.setUserId(Long.valueOf(userId));
+        order.setUserId(userId);
         order.setStatus(OrderStatus.CONFIRMED);
         order.setTotalAmount(totalPrice);
         List<OrderItem> orderItems = cartItems.stream()
