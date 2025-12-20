@@ -20,4 +20,14 @@ public class FallBackController {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Collections.singletonList("Product Service is down"));
     }
+    @RequestMapping (value="/userService/**", method = {RequestMethod.DELETE, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
+    public ResponseEntity<List<String>> userFallBack() {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Collections.singletonList("Product Service is down"));
+    }
+    @RequestMapping (value="/orderService/**", method = {RequestMethod.DELETE, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
+    public ResponseEntity<List<String>> orderFallBack() {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Collections.singletonList("Product Service is down"));
+    }
 }

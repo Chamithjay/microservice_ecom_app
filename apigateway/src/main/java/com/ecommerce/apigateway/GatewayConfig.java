@@ -14,7 +14,11 @@ public class GatewayConfig {
                 // User Service
                 .route("user", r -> r
                         .path("/users/**")
-                        .filters(f -> f.rewritePath("/users(?<segment>/?.*)", "/api/users${segment}"))
+                        .filters(f -> f
+                                .rewritePath("/users(?<segment>/?.*)", "/api/users${segment}")
+                                .circuitBreaker(c -> c
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("forward:/fallback/userService")))
                         .uri("lb://USER"))
 
                 // Product Service with Circuit Breaker
@@ -30,13 +34,21 @@ public class GatewayConfig {
                 // Order Service
                 .route("order", r -> r
                         .path("/orders/**")
-                        .filters(f -> f.rewritePath("/orders(?<segment>/?.*)", "/api/orders${segment}"))
+                        .filters(f -> f
+                                .rewritePath("/orders(?<segment>/?.*)", "/api/orders${segment}")
+                                .circuitBreaker(c -> c
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("forward:/fallback/orderService")))
                         .uri("lb://ORDER"))
 
                 // Cart Service
                 .route("cart", r -> r
                         .path("/cart/**")
-                        .filters(f -> f.rewritePath("/cart(?<segment>/?.*)", "/api/cart${segment}"))
+                        .filters(f -> f
+                                .rewritePath("/cart(?<segment>/?.*)", "/api/cart${segment}")
+                                .circuitBreaker(c -> c
+                                        .setName("ecomBreaker")
+                                        .setFallbackUri("forward:/fallback/orderService")))
                         .uri("lb://ORDER"))
                 .build();
     }
